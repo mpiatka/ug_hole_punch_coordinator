@@ -2,13 +2,20 @@
 #include <functional>
 #include "hole_punch_coordinator.hpp"
 
-HolePunchCoordinator::HolePunchCoordinator() : io_service(),
+HolePunchCoordinator::HolePunchCoordinator(int port) : port(port),
+	io_service(),
 	//work_guard(io_service.get_executor()),
 	acceptor(io_service),
 	pendingSocket(io_service)
 {
 
 }
+
+HolePunchCoordinator::HolePunchCoordinator() : HolePunchCoordinator(12345)
+{
+
+}
+
 
 void HolePunchCoordinator::worker(){
 	std::cout << "Running" << std::endl;
@@ -19,7 +26,7 @@ void HolePunchCoordinator::worker(){
 void HolePunchCoordinator::run(){
 	using namespace std::placeholders;
 
-	asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 12345);
+	asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
 	acceptor.open(endpoint.protocol());
 	acceptor.bind(endpoint);
 	acceptor.listen(asio::socket_base::max_connections);

@@ -11,6 +11,7 @@
 class HolePunchCoordinator {
 public:
 	HolePunchCoordinator();
+	HolePunchCoordinator(int port);
 	~HolePunchCoordinator() = default;
 
 	void run();
@@ -21,6 +22,8 @@ private:
 
 	void onConnectionAccepted(const std::error_code& ec);
 	void onClientDesc(Client& client, bool success);
+
+	int port;
 
 	asio::io_service io_service;
 	//asio::executor_work_guard<asio::io_service::executor_type> work_guard;
