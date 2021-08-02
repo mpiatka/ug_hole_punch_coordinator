@@ -30,7 +30,7 @@ void Room::addClient(std::unique_ptr<Client>&& client){
 
 void Room::onClientCandidate(Client& client, bool success){
 	if(!success){
-		std::cout << "Error reading candidate, removing client "
+		std::cerr << "Error reading candidate, removing client "
 			<< client.getClientName() << std::endl;
 
 		clients.erase(&client);
