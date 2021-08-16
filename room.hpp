@@ -5,11 +5,11 @@
 #include <memory>
 #include "client.hpp"
 
-class Room{
+class Room : public std::enable_shared_from_this<Room>{
 public:
 	Room(std::string name);
 
-	void addClient(std::unique_ptr<Client>&& client);
+	void addClient(std::shared_ptr<Client>&& client);
 
 	bool isFull() const { return clients.size() >= 2; }
 
@@ -17,7 +17,7 @@ private:
 	void onClientCandidate(Client& client, bool success);
 
 	std::string name;
-	std::map<Client *, std::unique_ptr<Client>> clients;
+	std::map<Client *, std::shared_ptr<Client>> clients;
 };
 
 #endif

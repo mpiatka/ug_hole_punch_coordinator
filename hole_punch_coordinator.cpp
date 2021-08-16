@@ -52,7 +52,7 @@ void HolePunchCoordinator::onConnectionAccepted(const std::error_code& ec){
 
 	using namespace std::placeholders;
 
-	auto client = std::make_unique<Client>(std::move(pendingSocket));
+	auto client = std::make_shared<Client>(std::move(pendingSocket));
 	client->readDescription(
 			std::bind(&HolePunchCoordinator::onClientDesc, this, _1, _2));
 	incomingClients.insert({client.get(), std::move(client)});
@@ -76,7 +76,7 @@ void HolePunchCoordinator::onClientDesc(Client& client, bool success){
 	auto roomIt = rooms.find(roomName);
 	if(roomIt == rooms.end()){
 		std::cout << "Creating room " << roomName << std::endl;
-		roomIt = rooms.insert({roomName, std::make_unique<Room>(roomName)}).first;
+		roomIt = rooms.insert({roomName, std::make_shared<Room>(roomName)}).first;
 	}
 
 	auto clientIt = incomingClients.find(&client);
@@ -87,5 +87,4 @@ void HolePunchCoordinator::onClientDesc(Client& client, bool success){
 		roomIt->second->addClient(std::move(clientIt->second));
 	}
 	incomingClients.erase(clientIt);
-
 }

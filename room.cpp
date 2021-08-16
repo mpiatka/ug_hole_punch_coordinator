@@ -4,7 +4,7 @@
 
 Room::Room(std::string name) : name(std::move(name)) {  }
 
-void Room::addClient(std::unique_ptr<Client>&& client){
+void Room::addClient(std::shared_ptr<Client>&& client){
 	assert(!isFull());
 
 	Client *clientPtr = client.get();
@@ -24,7 +24,7 @@ void Room::addClient(std::unique_ptr<Client>&& client){
 
 	using namespace std::placeholders;
 	clientPtr->readCandidate(
-			std::bind(&Room::onClientCandidate, this, _1, _2));
+			std::bind(&Room::onClientCandidate, shared_from_this(), _1, _2));
 
 }
 
@@ -48,5 +48,5 @@ void Room::onClientCandidate(Client& client, bool success){
 
 	using namespace std::placeholders;
 	client.readCandidate(
-			std::bind(&Room::onClientCandidate, this, _1, _2));
+			std::bind(&Room::onClientCandidate, shared_from_this(), _1, _2));
 }

@@ -32,8 +32,8 @@ private:
 	asio::ip::tcp::acceptor acceptor;
 	asio::ip::tcp::socket pendingSocket;
 
-	std::map<Client *, std::unique_ptr<Client>> incomingClients;
-	std::map<std::string, std::unique_ptr<Room>> rooms;
+	std::map<Client *, std::shared_ptr<Client>> incomingClients;
+	std::map<std::string, std::shared_ptr<Room>> rooms;
 };
 
 #endif //UG_HOLE_PUNCH_COORDINATOR

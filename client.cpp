@@ -6,7 +6,7 @@ void Client::readDescription(std::function<void(Client&, bool)> onComplete){
 	using namespace std::placeholders;
 	inMsg.async_readMsg(socket,
 			std::bind(&Client::readNameComplete,
-				this, std::ref(socket), onComplete, _1));
+				shared_from_this(), std::ref(socket), onComplete, _1));
 }
 
 void Client::readNameComplete(asio::ip::tcp::socket& socket,
@@ -22,7 +22,7 @@ void Client::readNameComplete(asio::ip::tcp::socket& socket,
 	using namespace std::placeholders;
 	inMsg.async_readMsg(socket,
 			std::bind(&Client::readRoomComplete,
-				this, std::ref(socket), onComplete, _1));
+				shared_from_this(), std::ref(socket), onComplete, _1));
 }
 
 void Client::readRoomComplete(asio::ip::tcp::socket& socket,
@@ -37,7 +37,7 @@ void Client::readRoomComplete(asio::ip::tcp::socket& socket,
 	roomName = std::string(inMsg.getStr());
 	using namespace std::placeholders;
 	inMsg.async_readMsg(socket,
-			std::bind(&Client::readDescComplete, this, onComplete, _1));
+			std::bind(&Client::readDescComplete, shared_from_this(), onComplete, _1));
 }
 
 void Client::readDescComplete(
@@ -57,7 +57,7 @@ void Client::readCandidate(std::function<void(Client&, bool)> onComplete){
 	using namespace std::placeholders;
 	inMsg.async_readMsg(socket,
 			std::bind(&Client::readCandidateComplete,
-				this, onComplete, _1));
+				shared_from_this(), onComplete, _1));
 }
 
 void Client::readCandidateComplete(
@@ -73,15 +73,20 @@ void Client::readCandidateComplete(
 	onComplete(*this, true);
 }
 
+bool Client::isSendCallbackPending() const{
+	return !sendQueue.empty() || outMsg.isSendingNow();
+}
+
+
 void Client::sendMsg(std::string_view msg){
-	if(!sendQueue.empty() || outMsg.isSendingNow()){
+	if(isSendCallbackPending()){
 		sendQueue.emplace(msg);
 		return;
 	}
 
 	outMsg.setStr(msg);
 	using namespace std::placeholders;
-	outMsg.async_sendMsg(socket, std::bind(&Client::onMsgSent, this, _1));
+	outMsg.async_sendMsg(socket, std::bind(&Client::onMsgSent, shared_from_this(), _1));
 }
 
 void Client::onMsgSent(bool success){
@@ -95,5 +100,5 @@ void Client::onMsgSent(bool success){
 	using namespace std::placeholders;
 	outMsg.setStr(sendQueue.front());
 	sendQueue.pop();
-	outMsg.async_sendMsg(socket, std::bind(&Client::onMsgSent, this, _1));
+	outMsg.async_sendMsg(socket, std::bind(&Client::onMsgSent, shared_from_this(), _1));
 }

@@ -5,10 +5,11 @@
 #include <vector>
 #include <queue>
 #include <functional>
+#include <memory>
 #include <asio.hpp>
 #include "message.hpp"
 
-class Client{
+class Client : public std::enable_shared_from_this<Client>{
 public:
 	Client(asio::ip::tcp::socket&& socket);
 	Client(const Client&) = delete;
@@ -26,6 +27,8 @@ public:
 
 	void readCandidate(std::function<void(Client&, bool)> onComplete);
 	const std::vector<std::string>& getCandidates() { return candidates; }
+
+	bool isSendCallbackPending() const;
 
 private:
 	void readNameComplete(asio::ip::tcp::socket& socket,
