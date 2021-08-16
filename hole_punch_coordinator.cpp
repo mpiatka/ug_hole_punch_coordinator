@@ -61,6 +61,17 @@ void HolePunchCoordinator::onConnectionAccepted(const std::error_code& ec){
 			std::bind(&HolePunchCoordinator::onConnectionAccepted, this, _1));
 }
 
+void HolePunchCoordinator::cleanEmptyRooms(){
+	for(auto it = rooms.begin(); it != rooms.end(); ){
+		if(it->second->isEmpty()){
+			std::cout << "Removing empty room " << it->first << "\n";
+			it = rooms.erase(it);
+		} else {
+			it++;
+		}
+	}
+}
+
 void HolePunchCoordinator::onClientDesc(Client& client, bool success){
 	if(!success){
 		std::cerr << "Error reading client description" << std::endl;
@@ -75,6 +86,7 @@ void HolePunchCoordinator::onClientDesc(Client& client, bool success){
 
 	auto roomIt = rooms.find(roomName);
 	if(roomIt == rooms.end()){
+		cleanEmptyRooms();
 		std::cout << "Creating room " << roomName << std::endl;
 		roomIt = rooms.insert({roomName, std::make_shared<Room>(roomName)}).first;
 	}

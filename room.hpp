@@ -12,6 +12,7 @@ public:
 	void addClient(std::shared_ptr<Client>&& client);
 
 	bool isFull() const { return clients.size() >= 2; }
+	bool isEmpty() const { return clients.empty(); }
 
 private:
 	void onClientCandidate(Client& client, bool success);

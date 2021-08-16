@@ -23,6 +23,8 @@ private:
 	void onConnectionAccepted(const std::error_code& ec);
 	void onClientDesc(Client& client, bool success);
 
+	void cleanEmptyRooms();
+
 	int port;
 
 	asio::io_service io_service;
